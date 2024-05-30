@@ -1,0 +1,104 @@
+<div class="p-10 flex flex-col w-screen h-full !gap-5 justify-between">
+  <form
+    class="card p-fluid flex justify-center items-end p-fluid [&>*]:w-full [&>label]:block [&>label]:font-bold [&>label]:mb-2 gap-2"
+  >
+    <div class="w-8/12 flex-grow">
+      <ng-container [tanstackField]="form" name="package" #package="field">
+        <label class="block font-bold mb-2" [for]="package.api.name"
+          >Package</label
+        >
+        <p-dropdown
+          *ngIf="getPackages() | async as packages"
+          [options]="packages"
+          [loading]="packageQuery.isLoading()"
+          dataKey="_id"
+          optionLabel="description"
+          optionValue="_id"
+          placeholder="Select a package"
+          (onChange)="package.api.handleChange($any($event).value)"
+        />
+      </ng-container>
+    </div>
+
+    <p-button
+      label="Track"
+      size="small"
+      outlined="true"
+      type="button"
+      disabled="true"
+    />
+  </form>
+
+  <div class="flex w-full justify-between">
+    <div class="">
+      @switch (deliveryQuery.status()) {
+        @case ("pending") {
+          Loading...
+        }
+        @case ("error") {
+          Error: {{ deliveryQuery.error()?.message }}
+        }
+        @default {
+          @for (delivery of deliveryQuery.data(); track delivery._id) {
+            <ng-container
+              *ngIf="
+                delivery.package._id === this.form.getFieldValue('package')
+              "
+            >
+              <div class="flex justify-evenly w-screen">
+                <div class="flex flex-col">
+                  <h1 class="text-rose-600 font-bold">Package Details</h1>
+                  <div class="text-gray-700">
+                    <p>
+                      {{ delivery.package.description }}
+                    </p>
+                    <p>Height: {{ delivery.package.height }}</p>
+                    <p>Weight: {{ delivery.package.weight }}</p>
+                    <p>Width: {{ delivery.package.width }}</p>
+                    <p>Depth: {{ delivery.package.depth }}</p>
+                  </div>
+
+                  <h1 class="text-green-600 font-bold mt-5">
+                    Delivery Details
+                  </h1>
+                  <div class="text-gray-700">
+                    <p>
+                      {{ delivery.description }}
+                    </p>
+                    <p>Status: {{ delivery.status.toUpperCase() }}</p>
+                    <p>
+                      Customer: {{ delivery.customer.firstName }}
+                      {{ delivery.customer.lastName }}
+                    </p>
+                    <p>Delivery Address: {{ delivery.customer.address }}</p>
+                  </div>
+                </div>
+
+                <div class="flex justify-evenly flex-grow-1">
+                  <google-map
+                    [zoom]="zoom"
+                    [center]="center"
+                    [options]="options"
+                  >
+                    <map-marker
+                      *ngFor="
+                        let marker of markers | keyvalue: keepOriginalOrder
+                      "
+                      [position]="$any(marker.value.markerOptions.position)"
+                      [options]="marker.value.markerOptions"
+                    />
+                  </google-map>
+                </div>
+              </div>
+            </ng-container>
+          }
+        }
+      }
+      <div>
+        @if (deliveryQuery.isFetching()) {
+          Deliveries loading...
+        }
+      </div>
+    </div>
+  </div>
+</div>
