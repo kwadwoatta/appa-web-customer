@@ -1,6 +1,8 @@
-# AppaWebCustomer
+# Appa Web Customer
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.1.
+<p align="center">
+  <img src="./public/appa.png" width="200" alt="Appa Logo" /></a>
+</p>
 
 ## Development server
 
